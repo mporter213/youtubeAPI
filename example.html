@@ -110,23 +110,8 @@
                     maxResults: 5,
                     pageToken: pageToken.current
                 }
-            }).done(function (data) {   
-                console.log(pageToken)
-                var html = "";
-                $.each(data['items'], function (index, value) {
-                    html += '<div><div class="title">' + value.snippet.title + '</div>';
-                    html += '<div><div class="title">' + value.snippet.description + '</div>';
-                    html += '<div><div class="url"><a href="https://www.youtube.com/watch?v=' + value.id.videoId + '" target="_blank">' + value.id.videoId + '</a></div>';
-                    html += '<div><img  class="thumbnail" src="' + value.snippet.thumbnails.default.url + '" videoID="' + value.id.videoId + '"></div>';
-                    
-                    html += '</div>';
-                })
-                $('#output').html(html);
             })
-        }
-      
-      function searchYouTubeVideos(statistics){
-        $.ajax({
+          $.ajax({
           url: 'https://www.googleapis.com/youtube/v3/videos',
           dataType: 'json',
                  type: 'GET',
@@ -141,13 +126,18 @@
                 console.log(pageToken)
                 var html = "";
                 $.each(data['items'], function (index, value) {
-                    html += '<div><div class="title">Like Count' + value.statistics.likeCount + '</div>';
-
+                    html += '<div><div class="title">' + value.snippet.title + '</div>';
+                    html += '<div><div class="title">' + value.snippet.description + '</div>';
+                    html += '<div><div class="url"><a href="https://www.youtube.com/watch?v=' + value.id.videoId + '" target="_blank">' + value.id.videoId + '</a></div>';
+                    html += '<div><img  class="thumbnail" src="' + value.snippet.thumbnails.default.url + '" videoID="' + value.id.videoId + '"></div>';
+                    html += '<div>Likes: ' + value.statistics.likeCount + '</div>';
                     html += '</div>';
                 })
                 $('#output').html(html);
             })
-      }
+        }
+      
+
       
 
         //https://www.googleapis.com/youtube/v3/search?q=test&part=snippet&key=AIzaSyD0ief9xzGnCjpMnll_O8u7s41x2QbQ7BI
