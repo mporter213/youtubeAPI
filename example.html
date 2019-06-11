@@ -1,0 +1,165 @@
+<html>
+<head>
+    <title>jQuery AJAX getting web APIs</title>
+    <style>
+        .popup{
+            background-color:black;
+            position: absolute;
+            border: solid 2px white;
+            width:600px;
+            min-height:auto;
+            z-index:5000;
+            top:100px;
+            margin-left:auto;
+            margin-right:auto;
+            left:0px;
+            right:0px;
+        }
+        .overlayBg{
+            background-color:#333;
+            opacity: 0.5;
+            position: absolute;
+            z-index:1000;
+            top:0px;
+            left:0px;
+            width:100%;
+            min-height:100%;
+        }
+    </style>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="jumbotron">
+    <h1>jQuery AJAX APIs</h1> 
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Navbar</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Link</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Dropdown
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="#">Action</a>
+          <a class="dropdown-item" href="#">Another action</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#">Something else here</a>
+        </div>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+      </li>
+    </ul>
+    <form class="form-inline my-2 my-lg-0">
+      <label>What did you want to find?</label>
+      <input class="form-control mr-sm-2" type="text" placeholder="Search" name="search" id="search" aria-label="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="button" value="search" id="searchButton">Search</button>
+    </form>
+
+</nav>
+  </div>
+
+
+    <div id="output" class="container"></div>
+    <div class="overlayBg"></div>
+    <div class="popup">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/WEkSYw3o5is" rel="0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        var pageToken = {};
+        $(document).ready(function () {
+            $('.popup').hide()
+            $('.overlayBg').hide()
+            $('#searchButton').click(function () {
+                searchYoutube();
+            })
+            $('.overlayBg').click(function () {
+                $('.popup').hide()
+                $('.overlayBg').hide()
+            })
+            $('#output').on('click', '.thumbnail', function () {
+                $('.popup').show()
+                $('.overlayBg').show();
+                $(window).scrollTop(0)
+                $('.popup iframe').attr('src', 'https://www.youtube.com/embed/' + $(this).attr('videoID'));
+            })
+        })
+      
+        function searchYoutube() {
+            $.ajax({
+                 url: 'https://www.googleapis.com/youtube/v3/search',
+                 dataType: 'json',
+                 type: 'GET',
+                 data: {
+                    key: 'AIzaSyD0ief9xzGnCjpMnll_O8u7s41x2QbQ7BI',
+                    q: $('#search').val(),
+                    part: 'snippet', 
+                    type: 'video',
+                    maxResults: 5,
+                    pageToken: pageToken.current
+                }
+            }).done(function (data) {   
+                console.log(pageToken)
+                var html = "";
+                $.each(data['items'], function (index, value) {
+                    html += '<div><div class="title">' + value.snippet.title + '</div>';
+                    html += '<div><div class="title">' + value.snippet.description + '</div>';
+                    html += '<div><div class="url"><a href="https://www.youtube.com/watch?v=' + value.id.videoId + '" target="_blank">' + value.id.videoId + '</a></div>';
+                    html += '<div><img  class="thumbnail" src="' + value.snippet.thumbnails.default.url + '" videoID="' + value.id.videoId + '"></div>';
+                    
+                    html += '</div>';
+                })
+                $('#output').html(html);
+            })
+        }
+      
+      function searchYouTubeVideos(statistics){
+        $.ajax({
+          url: 'https://www.googleapis.com/youtube/v3/videos',
+          dataType: 'json',
+                 type: 'GET',
+                  data: {
+                    key: 'AIzaSyD0ief9xzGnCjpMnll_O8u7s41x2QbQ7BI',
+                    q: $('#search').val(),
+                    part: 'contentDetails', 
+                    type: 'video',                   
+                    pageToken: pageToken.current
+                }
+        }).done(function (data) {   
+                console.log(pageToken)
+                var html = "";
+                $.each(data['items'], function (index, value) {
+                    html += '<div><div class="title">Like Count' + value.statistics.likeCount + '</div>';
+
+                    html += '</div>';
+                })
+                $('#output').html(html);
+            })
+      }
+      
+
+        //https://www.googleapis.com/youtube/v3/search?q=test&part=snippet&key=AIzaSyD0ief9xzGnCjpMnll_O8u7s41x2QbQ7BI
+        //https://www.googleapis.com/youtube/v3/videos?part=statistics&id=sTPtBvcYkO8&key=AIzaSyD0ief9xzGnCjpMnll_O8u7s41x2QbQ7BI
+
+        //https://developers.google.com/speed/libraries/
+        //https://developers.google.com/youtube/v3/docs/videos/list
+        //https://accounts.google.com/SignUp 
+      //https://console.developers.google.com/apis/credentials
+    </script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
+
